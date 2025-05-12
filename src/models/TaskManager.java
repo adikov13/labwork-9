@@ -80,6 +80,7 @@ public class TaskManager {
                 } else {
                     Task t = task.get(indexApp - 1);
                     addStatus(t, task);
+                    break;
                 }
             } catch (Exception e) {
                 System.out.println("Введите число");
