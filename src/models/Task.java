@@ -25,8 +25,6 @@ public class Task {
         this.createdDate = LocalDate.now();
         this.priority = priority;
         this.state = new NewState();
-
-
     }
 
     // Геттеры и сеттеры
@@ -94,7 +92,7 @@ public class Task {
     @Override
     public String toString() {
         String overdueMark = isOverdue() ? "*ПРОСРОЧЕНО* " : "";
-        return String.format("%s[%s] %s (Приоритет: %s, Создана: %s, Завершить до: %s, Статус: %s)",
+        return String.format("[%s] %s (Приоритет: %s, Создана: %s, Завершить до: %s, Статус: %s%n)",
                 overdueMark, title, description, priority,
                 createdDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                 completionDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));

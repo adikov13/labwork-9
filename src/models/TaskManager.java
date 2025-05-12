@@ -36,20 +36,24 @@ public class TaskManager {
         System.out.println("2 - Средний");
         System.out.println("3 - Высокий");
         int choosePriority = sc.nextInt();
+        Priority priority = null;
         switch (choosePriority) {
             case 1:
                 System.out.printf("Вы выбрали %s%n", Priority.LOW);
-                return Priority.LOW;
+                priority=  Priority.LOW;
+                break;
             case 2:
                 System.out.printf("Вы выбрали %s%n", Priority.MEDIUM);
-                return Priority.MEDIUM;
+                priority = Priority.MEDIUM;
+                break;
             case 3:
                 System.out.printf("Вы выбрали %s%n", Priority.HIGH);
-                return Priority.HIGH;
+                priority = Priority.HIGH;
+                break;
             default:
                 System.out.println("Нет такой команды");
         }
-        return null;
+        return priority;
     }
 
     private static String addTitle(){
@@ -79,6 +83,7 @@ public class TaskManager {
     private static LocalDate addCompletionDate() {
         DateTimeFormatter dateCompletionDate = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         String newDate = "";
+        LocalDate completion = null;
         while (newDate.isBlank()) {
             System.out.println("Введите дату в формате dd.MM.yyyy");
             newDate = sc.nextLine();
@@ -87,12 +92,13 @@ public class TaskManager {
                 System.out.println("Данный не подходит давай по проверяющий");
             } else {
                 try {
-                    LocalDate date = LocalDate.parse(newDate, dateCompletionDate);
+                    completion = LocalDate.parse(newDate, dateCompletionDate);
                 } catch (DateTimeException e) {
-                    System.out.println("Неверный формат даты");
+                    System.out.println("Неверный формат даты: 22.07.2023");
                 }
             }
+
         }
-        return null;
+        return completion;
     }
 }
