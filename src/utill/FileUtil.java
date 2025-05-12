@@ -1,19 +1,19 @@
 package utill;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-public class FileUtil {
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+public class FileUtil {
+
     public class utill {
         private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
 
-        private FileUtil() {
-        }
+//        private FileUtil() {
+//        }
 
         public static Tasks[] readTaskFile() {
             try {
