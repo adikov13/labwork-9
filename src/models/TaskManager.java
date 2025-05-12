@@ -1,30 +1,32 @@
 package models;
 
-import jdk.jshell.Snippet;
+import state.TaskState;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
+import static java.util.Comparator.comparingDouble;
+
 public class TaskManager {
     static Scanner sc = new Scanner(System.in);
-    public static void toDoAppRun(){
+
+    public static void toDoAppRun() {
         List<Task> tasks = new ArrayList<>();
         menuUser(tasks);
     }
 
-    private static void menuUser(List<Task> task){
-        while (true){
+    private static void menuUser(List<Task> task) {
+        while (true) {
             System.out.println("Выберите команду");
             System.out.println("1 - Посмотреть все задачи");
             System.out.println("2 - Добавить задачу");
             System.out.println("3 - Выбрать задачу");
+            System.out.println("3 - Список сортировки");
             System.out.println("0 - Выход");
             int chooseCommand = sc.nextInt();
             switch (chooseCommand) {
@@ -37,6 +39,9 @@ public class TaskManager {
                 case 3:
                     choseApp(task);
                     break;
+                case 4:
+                    sortTasks(task);
+                    break;
                 case 0:
                     return;
                 default:
@@ -48,35 +53,35 @@ public class TaskManager {
 
 
     private static void printTask(List<Task> task) {
-        int i = 1;
-        System.out.println("----+--------+-------+--------+----------+-------+---------------+");
-        for (Task t : task) {
-            System.out.printf("|%d |%n|Название: %3s|%n|Описание: %3s|%n|Дата Создания: %3s||Дата Завершения: %3s|%n|Приоритет: %3s|Статус: %4s |%n",
-                    i++, t.getTitle(), t.getDescription(),  t.getCreatedDate(), t.getCompletionDate(),
-                     t.getPriority(), t.getState());
+        if (task.isEmpty()) {
+            System.out.println("Список задач пуст");
+        } else {
+            int i = 1;
+            System.out.println("----+--------+-------+--------+----------+-------+---------------+");
+            for (Task t : task) {
+                System.out.printf("|Задача №%d |%n|Название: %3s|%n|Описание: %3s|%n|Дата Создания: %3s||Дата Завершения: %3s|%n|Приоритет: %3s|Статус: %4s |%n",
+                        i++, t.getTitle(), t.getDescription(), t.getCreatedDate(), t.getCompletionDate(),
+                        t.getPriority(), t.getState());
+            }
+            System.out.println("----+--------+-------+--------+----------+-------+---------------+");
         }
-        System.out.println("----+--------+-------+--------+----------+-------+---------------+");
+
     }
 
-    private static void choseApp(List<Task> task){
+    private static void choseApp(List<Task> task) {
         printTask(task);
         int indexApp = task.size();
-        while (indexApp >= task.size() || indexApp < 1){
+        while (indexApp >= task.size() || indexApp < 1) {
             System.out.printf("Введите номер задачи (1-%s)%n", task.size());
-            try{
+            try {
                 indexApp = sc.nextInt();
                 sc.nextLine();
-                if(indexApp > task.size() || indexApp < 1){
+                if (indexApp > task.size() || indexApp < 1) {
                     System.out.println("Данный не подходит давай по новой");
-                }else {
-                    Task t = task.get(indexApp-1);
-                    System.out.printf("|Название: %3s|%n|Описание: %3s|%n|Дата Создания: %3s||Дата Завершения: %3s|%n|Приоритет: %3s|Статус: %4s |%n",
-                             t.getTitle(), t.getDescription(),  t.getCreatedDate(), t.getCompletionDate(),
-                            t.getPriority(), t.getState());
-                    Status newState = addStatus();
-                    t.changeStatus(newState.name());
-                    break;
-                };
+                } else {
+                    Task t = task.get(indexApp - 1);
+                    addStatus(t, task);
+                }
             } catch (Exception e) {
                 System.out.println("Введите число");
                 sc.nextLine();
@@ -85,34 +90,34 @@ public class TaskManager {
     }
 
 
-    private static void addApp(List<Task> task){
+    private static void addApp(List<Task> task) {
         String appTitle = addTitle();
         String appDescription = addDescription();
-        LocalDate appDate= addCompletionDate();
+        LocalDate appDate = addCompletionDate();
         Priority appPriority = addPriority();
-        task.add(new Task(appTitle, appDescription, appDate ,appPriority));
+        task.add(new Task(appTitle, appDescription, appDate, appPriority));
         System.out.println(task);
     }
 
 
-    private static String addTitle(){
+    private static String addTitle() {
         String newTitle = "";
-        while (newTitle.isEmpty()){
+        while (newTitle.isEmpty()) {
             System.out.println("Введите название задачи");
             newTitle = sc.nextLine();
-            if(newTitle.isEmpty()){
+            if (newTitle.isEmpty()) {
                 System.out.println("Данный не подходит давай по проверяющий");
             }
         }
         return newTitle;
     }
 
-    private static String addDescription(){
+    private static String addDescription() {
         String newDescription = "";
-        while (newDescription.isBlank()){
+        while (newDescription.isBlank()) {
             System.out.println("Введите описание задачи");
             newDescription = sc.nextLine();
-            if(newDescription.isBlank()){
+            if (newDescription.isBlank()) {
                 System.out.println("Данный не подходит давай по проверяющий");
             }
         }
@@ -138,54 +143,120 @@ public class TaskManager {
     }
 
     private static Priority addPriority() {
-        System.out.println("Выберите приоритет");
-        System.out.println("1 - Низкий");
-        System.out.println("2 - Средний");
-        System.out.println("3 - Высокий");
-        int choosePriority = sc.nextInt();
-        Priority priority = null;
-        switch (choosePriority) {
-            case 1:
-                System.out.printf("Вы выбрали %s приоритет%n", Priority.LOW);
-                priority=  Priority.LOW;
-                break;
-            case 2:
-                System.out.printf("Вы выбрали %s приоритет%n", Priority.MEDIUM);
-                priority = Priority.MEDIUM;
-                break;
-            case 3:
-                System.out.printf("Вы выбрали %s приоритет%n", Priority.HIGH);
-                priority = Priority.HIGH;
-                break;
-            default:
-                System.out.println("Нет такого приоритета");
+        while (true) {
+            System.out.println("Выберите приоритет");
+            System.out.println("1 - Низкий");
+            System.out.println("2 - Средний");
+            System.out.println("3 - Высокий");
+            int choosePriority = sc.nextInt();
+            switch (choosePriority) {
+                case 1:
+                    System.out.printf("Вы выбрали %s приоритет%n", Priority.LOW);
+                    return Priority.LOW;
+                case 2:
+                    System.out.printf("Вы выбрали %s приоритет%n", Priority.MEDIUM);
+                    return Priority.MEDIUM;
+                case 3:
+                    System.out.printf("Вы выбрали %s приоритет%n", Priority.HIGH);
+                    return Priority.HIGH;
+                default:
+                    System.out.println("Нет такого приоритета");
+            }
         }
-        return priority;
+
     }
 
-    private static Status addStatus() {
-        System.out.println("Выберите статус");
-        System.out.println("1 - Новая");
-        System.out.println("2 - В работе");
-        System.out.println("3 - Выполнена");
-        int chooseStatus = sc.nextInt();
-        Status state = null;
-        switch (chooseStatus) {
-            case 1:
-                System.out.printf("У вас %s задача %n", Status.NEW);
-                state =  Status.NEW;
-                break;
-            case 2:
-                System.out.printf("Ваша задача в %s%n", Status.IN_PROGRESS);
-                state = Status.IN_PROGRESS;
-                break;
-            case 3:
-                System.out.printf("Вы %s задачу%n",  Status.DONE);
-                state = Status.DONE;
-                break;
-            default:
-                System.out.println("Нет задачи");
+    private static void addStatus(Task task, List<Task> tasks) {
+
+        TaskState st = task.getState();
+        System.out.printf("|Название: %3s|%n|Описание: %3s|%n|Дата Создания: %3s||Дата Завершения: %3s|%n|Приоритет: %3s|Статус: %4s |%n",
+                task.getTitle(), task.getDescription(), task.getCreatedDate(), task.getCompletionDate(),
+                task.getPriority(), task.getState());
+        boolean appStatus = true;
+        while (appStatus) {
+            int choose;
+            switch (st.getName()) {
+                case "NEW":
+                    System.out.println("1 - Изменит на статус В работе");
+                    System.out.println("2 - Изменить описание");
+                    System.out.println("3 - Удаление задачи");
+                    System.out.println("0-выход");
+                    choose = sc.nextInt();
+                    switch (choose) {
+                        case 1:
+                            task.changeStatus(Status.IN_PROGRESS.name());
+                            appStatus = false;
+                            break;
+                        case 2:
+                            task.editDescription(addDescription());
+                            break;
+                        case 3:
+                            if (task.canDelete()) {
+                                tasks.remove(task);
+                                System.out.printf("Вы удалили задачу %s%n", task.getTitle());
+                                appStatus = false;
+                                break;
+                            } else {
+                                System.out.println("Задачу удалить нельзя");
+                                break;
+                            }
+                        case 0:
+                            appStatus = false;
+                            break;
+                        default:
+                            System.out.println("Нет такой команды");
+                    }
+                    break;
+                case "In_PROGRESS":
+                    System.out.println("1 - Изменит на статус Выполнена");
+                    System.out.println("2 - Изменить описание");
+                    System.out.println("0-выход");
+                    choose = sc.nextInt();
+                    switch (choose) {
+                        case 1:
+                            task.changeStatus(Status.IN_PROGRESS.name());
+                            appStatus = false;
+                            break;
+                        case 0:
+                            appStatus = false;
+                            break;
+                        default:
+                            System.out.println("Нет такой команды");
+                    }
+                    break;
+                case "DONE":
+                    System.out.println("1 - Задачу завершена удалять нельзя");
+                    System.out.println("0-выход");
+                    choose = sc.nextInt();
+                    if (choose == 0) {
+                        appStatus = false;
+                    } else {
+                        System.out.println("Нет такой команды");
+                    }
+                    break;
+            }
         }
-        return state;
+    }
+
+    public static void sortTasks(List<Task> tasks){
+        System.out.println("1 - По приоритету");
+        System.out.println("2 - По описанию");
+        System.out.println("3 - По дате создания");
+        System.out.println("0-выход");
+        int choose = sc.nextInt();
+        switch (choose){
+            case 1:
+                System.out.println("По приоритету");
+                tasks.sort(Comparator.comparing(Task::getPriority).reversed());
+                printTask(tasks);
+            case 2:
+                System.out.println("По описанию");
+                tasks.sort(Comparator.comparing(Task::getDescription).reversed());
+                printTask(tasks);
+            case 3:
+                System.out.println("По дате создания");
+                tasks.sort(Comparator.comparing(Task::getCreatedDate).reversed());
+                printTask(tasks);
+        }
     }
 }
