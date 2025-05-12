@@ -9,11 +9,6 @@ public interface TaskState {
         void changeState(Task task, String newState);
         void editDescription(Task task, String newDesc);
         boolean canDelete();
-
-
-
-
-
 }
 
 
