@@ -10,8 +10,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
-import static java.util.Comparator.comparingDouble;
-
 public class TaskManager {
     static Scanner sc = new Scanner(System.in);
 
@@ -26,9 +24,10 @@ public class TaskManager {
             System.out.println("1 - Посмотреть все задачи");
             System.out.println("2 - Добавить задачу");
             System.out.println("3 - Выбрать задачу");
-            System.out.println("3 - Список сортировки");
+            System.out.println("4 - Список сортировки");
             System.out.println("0 - Выход");
             int chooseCommand = sc.nextInt();
+            sc.nextLine();
             switch (chooseCommand) {
                 case 1:
                     printTask(task);
@@ -182,6 +181,7 @@ public class TaskManager {
                     System.out.println("3 - Удаление задачи");
                     System.out.println("0-выход");
                     choose = sc.nextInt();
+                    sc.nextLine();
                     switch (choose) {
                         case 1:
                             task.changeStatus(Status.IN_PROGRESS.name());
@@ -212,6 +212,7 @@ public class TaskManager {
                     System.out.println("2 - Изменить описание");
                     System.out.println("0-выход");
                     choose = sc.nextInt();
+                    sc.nextLine();
                     switch (choose) {
                         case 1:
                             task.changeStatus(Status.IN_PROGRESS.name());
@@ -228,12 +229,14 @@ public class TaskManager {
                     System.out.println("1 - Задачу завершена удалять нельзя");
                     System.out.println("0-выход");
                     choose = sc.nextInt();
+                    sc.nextLine();
                     if (choose == 0) {
                         appStatus = false;
+                        break;
                     } else {
                         System.out.println("Нет такой команды");
                     }
-                    break;
+                    return;
             }
         }
     }
@@ -244,19 +247,23 @@ public class TaskManager {
         System.out.println("3 - По дате создания");
         System.out.println("0-выход");
         int choose = sc.nextInt();
+        sc.nextLine();
         switch (choose){
             case 1:
                 System.out.println("По приоритету");
                 tasks.sort(Comparator.comparing(Task::getPriority).reversed());
                 printTask(tasks);
+                break;
             case 2:
                 System.out.println("По описанию");
                 tasks.sort(Comparator.comparing(Task::getDescription).reversed());
                 printTask(tasks);
+                break;
             case 3:
                 System.out.println("По дате создания");
                 tasks.sort(Comparator.comparing(Task::getCreatedDate).reversed());
                 printTask(tasks);
+                break;
         }
     }
 }
