@@ -2,25 +2,23 @@ package state;
 
 import models.Task;
 
-public class InProgressState implements TaskState {
+public class OverdueState implements TaskState {
     @Override
     public String getName() {
-        return "IN_PROGRESS";
+        return "OVERDUE";
     }
 
     @Override
     public void changeState(Task task, String newState) {
+        System.out.println("Просроченную задачу можно только завершить");
         if ("DONE".equalsIgnoreCase(newState)) {
             task.setState(new DoneState());
-            System.out.println("Статус изменен на 'Выполнена'");
-        } else {
-            System.out.println("Из статуса IN_PROGRESS можно перейти только в DONE");
         }
     }
 
     @Override
     public void editDescription(Task task, String newDesc) {
-        System.out.println("Нельзя изменить описание задачи в состоянии IN_PROGRESS");
+        System.out.println("Нельзя изменить описание просроченной задачи");
     }
 
     @Override

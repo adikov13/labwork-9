@@ -23,6 +23,9 @@ public class DoneState implements TaskState {
         return false;
     }
 
-
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }
 
